@@ -33,12 +33,10 @@
         }: let
           copyType = extension: pathName: let
             filteredFiles = filter (pathEndsWith ("." + extension)) files;
+            filename = file: lists.last (strings.splitString "/" (toString file));
           in
             (optionalString (filteredFiles != []) "mkdir -p $out/share/fonts/${pathName}\n")
-            + concatStringsSep "\n" (map (file: ''
-                filename=$(${pkgs.fontconfig}/bin/fc-query -f %{postscriptname} ${file}).${extension}
-                cp -v ${file} $out/share/fonts/${pathName}/$filename
-              '')
+            + concatStringsSep "\n" (map (file: "cp -v ${file} $out/share/fonts/${pathName}/${filename file}")
               filteredFiles);
         in
           pkgs.stdenvNoCC.mkDerivation {
@@ -70,6 +68,12 @@
             files = [./ggsans-Normal.woff2 ./ggsans-Medium.woff2 ./ggsans-SemiBold.woff2];
             license = licenses.unfree;
             author = "Colophon Foundry";
+          }
+          {
+            name = "Caveat";
+            files = [./Caveat.ttf];
+            license = licenses.ofl;
+            author = "Pablo Impallari and Alexi Vanyashin";
           }
         ];
       in {
